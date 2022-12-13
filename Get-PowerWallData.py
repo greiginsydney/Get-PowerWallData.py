@@ -58,55 +58,96 @@ try:
     result['prtg'].update({'result': []})
 
     result['prtg']['result'].append(
-        {'channel' : 'Battery charge',
-        'value' : "{:.0f}".format(pw.level()),
-        'unit' : 'Custom',
-        'float' : 0,
-        'showChart' : 1,
-        'showTable' : 1,
-        'primary' : 1
+        {'Channel' : 'Battery charge',
+        'Value' : "{:.0f}".format(pw.level()),
+        'Unit' : 'Percent',
+        'Float' : 0,
+        'ShowChart' : 1,
+        'ShowTable' : 1,
+        'Primary' : 1
         })
 
     result['prtg']['result'].append(
-        {'channel' : 'Grid',
-        'value' : "{:.3f}".format(pw.grid()/1000),
-        'unit' : 'Custom',
-        'customUnit' : 'kW',
-        'float' : 1,
-        'showChart' : 1,
-        'showTable' : 1,
-
+        {'Channel' : 'Grid',
+        'Value' : "{:.3f}".format(pw.grid()/1000),
+        'Unit' : 'Custom',
+        'CustomUnit' : 'kW',
+        'Float' : 1,
+        'ShowChart' : 1,
+        'ShowTable' : 1,
         })
 
     result['prtg']['result'].append(
         {'Channel' : 'Battery',
-        'value' : "{:.3f}".format(pw.battery()/1000),
-        'unit' : 'Custom',
-        'customUnit' : 'kW',
-        'float' : 1,
-        'showChart' : 1,
-        'showTable' : 1
+        'Value' : "{:.3f}".format(pw.battery()/1000),
+        'Unit' : 'Custom',
+        'CustomUnit' : 'kW',
+        'Float' : 1,
+        'ShowChart' : 1,
+        'ShowTable' : 1
         })
 
     result['prtg']['result'].append(
         {'Channel' : 'Load',
-        'value' : "{:.3f}".format(pw.load()/1000),
-        'unit' : 'Custom',
-        'customUnit' : 'kW',
-        'float' : 1,
-        'showChart' : 1,
-        'showTable' : 1
+        'Value' : "{:.3f}".format(pw.load()/1000),
+        'Unit' : 'Custom',
+        'CustomUnit' : 'kW',
+        'Float' : 1,
+        'ShowChart' : 1,
+        'ShowTable' : 1
         })
 
     result['prtg']['result'].append(
         {'Channel' : 'Solar',
-        'value' : "{:.3f}".format(pw.solar()/1000),
-        'unit' : 'Custom',
-        'customUnit' : 'kW',
-        'float' : 1,
-        'showChart' : 1,
-        'showTable' : 1
+        'Value' : "{:.3f}".format(pw.solar()/1000),
+        'Unit' : 'Custom',
+        'CustomUnit' : 'kW',
+        'Float' : 1,
+        'ShowChart' : 1,
+        'ShowTable' : 1
         })
+
+    temps = pw.temps()
+    whichBattery = 1
+    for thisBattery in temps:
+        if len(temps) == 1:
+            batteryLabel = 'Battery temperature'
+        else:
+            batteryLabel = "Battery {} temperature".format(whichBattery)
+        result['prtg']['result'].append(
+            {'Channel' : batteryLabel,
+            'Value' : "{:.01f}".format(temps[thisBattery]),
+            'Unit' : 'Temperature',
+            'Float' : 1,
+            'ShowChart' : 1,
+            'ShowTable' : 1
+            })
+        whichBattery += 1
+
+    result['prtg']['result'].append(
+        {'Channel' : 'PowerWall version',
+        'Value' : "{}".format(pw.version()[0]),
+        'Unit' : 'Custom',
+        'CustomUnit' : '&nbsp;',
+        'Float' : 0,
+        'ShowChart' : 0,
+        'ShowTable' : 1,
+        'ShowChanged' : 1
+        })
+
+    BatteryFull = pw.system_status()['nominal_full_pack_energy']
+    BatteryRemaining = pw.system_status()['nominal_energy_remaining']
+
+    result['prtg']['result'].append(
+        {'Channel' : 'Battery health',
+        'Value' : "{:.0f}".format((BatteryRemaining / BatteryFull) * 100),
+        'Unit' : 'Percent',
+        'Float' : 0,
+        'ShowChart' : 1,
+        'ShowTable' : 1,
+        'ShowChanged' : 1
+        })
+
 
 except Exception as e:
     result = {'prtg': {'text' : 'Python Script execution error', 'error' : "%s" % str(e)}}
