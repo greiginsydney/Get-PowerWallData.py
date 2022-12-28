@@ -32,6 +32,10 @@ password='ABCD1234'
 email='example@example.com'
 timezone = "Australia/Sydney"  # Your local timezone. Reference: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+#Adjust this figure for your local market. This is used to calculate the Battery Health value
+batteryNew = 13200 #Tesla warrants the battery as 13.2kWh in AU, as at 9 Feb 2017. See https://www.tesla.com/sites/default/files/pdfs/powerwall/Powerwall_2_AC_Warranty_AUS-NZ_1-0.pdf
+
+
 try:
     host = ''
     if len(sys.argv) > 1:
@@ -88,7 +92,7 @@ try:
         })
 
     result['prtg']['result'].append(
-        {'Channel' : 'Load',
+        {'Channel' : 'Home',
         'Value' : "{:.3f}".format(pw.load()/1000),
         'Unit' : 'Custom',
         'CustomUnit' : 'kW',
@@ -124,6 +128,24 @@ try:
             })
         whichBattery += 1
 
+    batteryStatus = pw.system_status()['battery_blocks']
+    whichBattery = 1
+    for thisBattery in batteryStatus:
+        if len(temps) == 1:
+            batteryLabel = 'Battery health'
+        else:
+            batteryLabel = "Battery {} health".format(whichBattery)
+        batteryFull = thisBattery['nominal_full_pack_energy']
+        result['prtg']['result'].append(
+            {'Channel' : batteryLabel,
+            'Value' : "{:.0f}".format((batteryFull / batteryNew) * 100),
+            'Unit' : 'Percent',
+            'Float' : 1,
+            'ShowChart' : 0,
+            'ShowTable' : 1
+            })
+        whichBattery += 1
+
     result['prtg']['result'].append(
         {'Channel' : 'PowerWall version',
         'Value' : "{}".format(pw.version()[0]),
@@ -134,20 +156,6 @@ try:
         'ShowTable' : 1,
         'ShowChanged' : 1
         })
-
-    BatteryFull = pw.system_status()['nominal_full_pack_energy']
-    BatteryRemaining = pw.system_status()['nominal_energy_remaining']
-
-    result['prtg']['result'].append(
-        {'Channel' : 'Battery health',
-        'Value' : "{:.0f}".format((BatteryRemaining / BatteryFull) * 100),
-        'Unit' : 'Percent',
-        'Float' : 0,
-        'ShowChart' : 1,
-        'ShowTable' : 1,
-        'ShowChanged' : 1
-        })
-
 
 except Exception as e:
     result = {'prtg': {'text' : 'Python Script execution error', 'error' : "%s" % str(e)}}
