@@ -27,7 +27,7 @@ import sys
 # Optional: Turn on Debug Mode
 # pypowerwall.set_debug(True)
 
-# Credentials for your Powerwall - Customer Login Data
+# Credentials for your PowerWall - Customer Login Data
 password='PBHXV'
 email='gspam1@gisyd.com'
 
@@ -58,7 +58,7 @@ def main():
         else:
             result = {'prtg': {'text' : "This sensor queries %s" % host}}
 
-        # Connect to Powerwall
+        # Connect to PowerWall
         pw = pypowerwall.Powerwall(host,password,email,timezone)
         if not pw.is_connected():
             result = {'prtg': {'text' : 'Unable to connect to {}'.format(host)}}
@@ -176,4 +176,4 @@ if __name__ == '__main__':
 
 # References:
 # pypowerwall https://github.com/jasonacox/pypowerwall
-# Tesla Powerwall 2 - Local Gateway API documentation https://github.com/vloschiavo/powerwall2
+# Tesla PowerWall 2 - Local Gateway API documentation https://github.com/vloschiavo/powerwall2
